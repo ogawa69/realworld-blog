@@ -8,19 +8,41 @@ const initialState = {
 }
 
 export const getArticles = createAsyncThunk('articles/getArticles', async (page, { rejectWithValue, dispatch }) => {
+  const token = localStorage.getItem('token')
   try {
-    page = page ? page : 1
-    const offset = page === 1 ? 0 : page * 5 - 5
+    if (token) {
+      page = page ? page : 1
+      const offset = page === 1 ? 0 : page * 5 - 5
 
-    const response = await fetch(`https://api.realworld.io/api/articles?limit=5&offset=${offset}`)
+      const response = await fetch(`https://api.realworld.io/api/articles?limit=5&offset=${offset}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8',
+          Authorization: `Token ${token}`,
+        },
+      })
 
-    if (!response.ok) {
-      throw new Error('Get articles list error', response.status)
+      if (!response.ok) {
+        throw new Error('Get articles list error', response.status)
+      }
+
+      const articles = await response.json()
+      dispatch(setArticles(articles.articles))
     }
 
-    const articles = await response.json()
+    if (!token) {
+      page = page ? page : 1
+      const offset = page === 1 ? 0 : page * 5 - 5
 
-    dispatch(setArticles(articles.articles))
+      const response = await fetch(`https://api.realworld.io/api/articles?limit=5&offset=${offset}`)
+
+      if (!response.ok) {
+        throw new Error('Get articles list error', response.status)
+      }
+
+      const articles = await response.json()
+      dispatch(setArticles(articles.articles))
+    }
   } catch (error) {
     return rejectWithValue(error.message)
   }

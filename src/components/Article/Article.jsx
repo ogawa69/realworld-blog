@@ -3,14 +3,26 @@ import { useDispatch, useSelector } from 'react-redux'
 import { format } from 'date-fns'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
+import { Spin } from 'antd'
 
-import { deleteArticle } from '../../store/articlePageSlice'
+import { deleteArticle, likeArticle, unlikeArticle } from '../../store/articlePageSlice'
 import heart from '../../assets/Vector.svg'
+import heartSecond from '../../assets/path4.svg'
 import warn from '../../assets/warn.svg'
 
 import style from './Article.module.scss'
 
-const Article = ({ author, slug, createdAt, favoritesCount, description, tagList, title, isPage = false }) => {
+const Article = ({
+  author,
+  slug,
+  createdAt,
+  favorited,
+  favoritesCount,
+  description,
+  tagList,
+  title,
+  isPage = false,
+}) => {
   const dispatch = useDispatch()
   if (!author) {
     return null
@@ -18,6 +30,7 @@ const Article = ({ author, slug, createdAt, favoritesCount, description, tagList
 
   const userName = useSelector((state) => state.user.userData.username)
   const [visibleWarn, setVisibleWarn] = useState(false)
+  const likeLoading = useSelector((state) => state.articlePage.likeLoading)
   const auth = localStorage.getItem('token')
   const { image, username } = author
 
@@ -41,6 +54,14 @@ const Article = ({ author, slug, createdAt, favoritesCount, description, tagList
     setVisibleWarn(true)
   }
 
+  const onLike = () => {
+    if (favorited) {
+      dispatch(unlikeArticle(slug))
+      return
+    }
+    dispatch(likeArticle(slug))
+  }
+
   const warnClassNames = classNames({ [style.warning]: visibleWarn }, { hidden: !visibleWarn })
 
   const formatDate = format(new Date(createdAt), 'MMMM d, yyyy')
@@ -55,10 +76,14 @@ const Article = ({ author, slug, createdAt, favoritesCount, description, tagList
                 {title}
               </Link>
             )) || <span className={style.article__title}>{title}</span>}
-            <button className={style.article__likes} disabled={true}>
-              <img src={heart}></img>
-              {favoritesCount}
-            </button>
+            {likeLoading ? (
+              <Spin className={style.article__likes} size="small" />
+            ) : (
+              <button className={style.article__likes} onClick={onLike} disabled={!auth && true}>
+                <img src={favorited ? heartSecond : heart}></img>
+                {favoritesCount}
+              </button>
+            )}
           </div>
           <div className={style.article__tags}>{tags}</div>
         </div>

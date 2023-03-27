@@ -7,20 +7,13 @@ import Article from '../Article'
 
 const ArticleList = () => {
   const dispatch = useDispatch()
-  const articles = useSelector((state) => state.articles.articles)
-  const loading = useSelector((state) => state.articles.loading)
-  const error = useSelector((state) => state.articles.error)
-  const currPage = useSelector((state) => state.articles.currPage)
+  const articlesState = useSelector((state) => state.articles)
+  const { articles, loading, error, currPage } = articlesState
+  const likeLoading = useSelector((state) => state.articlePage.likeLoading)
 
   useEffect(() => {
     dispatch(getArticles())
-  }, [])
-
-  const createArticles = (array) => {
-    return array.map(({ slug, ...data }) => {
-      return <Article key={slug} slug={slug} {...data} />
-    })
-  }
+  }, [likeLoading])
 
   if (loading) {
     return <Spin style={{ marginTop: 300 }}></Spin>
@@ -32,7 +25,9 @@ const ArticleList = () => {
 
   return (
     <>
-      {createArticles(articles)}
+      {articles.map(({ slug, ...data }) => {
+        return <Article key={slug} slug={slug} {...data} />
+      })}
       <Pagination
         style={{ marginLeft: 'auto', marginRight: 'auto', marginBottom: 20 }}
         defaultCurrent={currPage}
