@@ -1,15 +1,24 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { format } from 'date-fns'
 import { Link } from 'react-router-dom'
+import classNames from 'classnames'
 
+import { deleteArticle } from '../../store/articlePageSlice'
 import heart from '../../assets/Vector.svg'
+import warn from '../../assets/warn.svg'
 
 import style from './Article.module.scss'
 
 const Article = ({ author, slug, createdAt, favoritesCount, description, tagList, title, isPage = false }) => {
+  const dispatch = useDispatch()
   if (!author) {
     return null
   }
+
+  const userName = useSelector((state) => state.user.userData.username)
+  const [visibleWarn, setVisibleWarn] = useState(false)
+  const auth = localStorage.getItem('token')
   const { image, username } = author
 
   const tags = tagList.map((el) => {
@@ -28,6 +37,12 @@ const Article = ({ author, slug, createdAt, favoritesCount, description, tagList
     }
   }
 
+  const onDelete = () => {
+    setVisibleWarn(true)
+  }
+
+  const warnClassNames = classNames({ [style.warning]: visibleWarn }, { hidden: !visibleWarn })
+
   const formatDate = format(new Date(createdAt), 'MMMM d, yyyy')
 
   return (
@@ -35,9 +50,11 @@ const Article = ({ author, slug, createdAt, favoritesCount, description, tagList
       <div className={style.article__wrap}>
         <div className={style['article__left-side']}>
           <div className={style['article__left-wrapper']}>
-            <Link to={`/articles/${slug}`} className={style.article__title}>
-              {title}
-            </Link>
+            {(!isPage && (
+              <Link to={`/articles/${slug}`} className={style.article__title}>
+                {title}
+              </Link>
+            )) || <span className={style.article__title}>{title}</span>}
             <button className={style.article__likes} disabled={true}>
               <img src={heart}></img>
               {favoritesCount}
@@ -53,7 +70,33 @@ const Article = ({ author, slug, createdAt, favoritesCount, description, tagList
           <img className={style.article__img} src={image}></img>
         </div>
       </div>
-      <span className={style.article__text}>{isPage ? description : cutOverview(description)}</span>
+      <div className={style['article__down-side']}>
+        <span className={style.article__text}>{isPage ? description : cutOverview(description)}</span>
+        {auth && isPage && userName === username && (
+          <div className={style.article__actions}>
+            <button className={style.article__delete} onClick={onDelete}>
+              Delete
+            </button>
+            <div className={warnClassNames}>
+              <div className={style.warning__info}>
+                <img className={style.warning__img} src={warn}></img>
+                <span className={style.warning__text}>Are you sure to delete this article?</span>
+              </div>
+              <div className={style.warning__actions}>
+                <button className={style.warning__button} onClick={() => setVisibleWarn(false)}>
+                  No
+                </button>
+                <button className={style.warning__button} onClick={() => dispatch(deleteArticle(slug))}>
+                  Yes
+                </button>
+              </div>
+            </div>
+            <Link className={style.article__edit} to={`/articles/${slug}/edit`}>
+              Edit
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

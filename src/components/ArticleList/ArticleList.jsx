@@ -10,6 +10,7 @@ const ArticleList = () => {
   const articles = useSelector((state) => state.articles.articles)
   const loading = useSelector((state) => state.articles.loading)
   const error = useSelector((state) => state.articles.error)
+  const currPage = useSelector((state) => state.articles.currPage)
 
   useEffect(() => {
     dispatch(getArticles())
@@ -34,7 +35,7 @@ const ArticleList = () => {
       {createArticles(articles)}
       <Pagination
         style={{ marginLeft: 'auto', marginRight: 'auto', marginBottom: 20 }}
-        defaultCurrent={1}
+        defaultCurrent={currPage}
         onChange={(page) => {
           dispatch(setPage(page))
           dispatch(getArticles(page))

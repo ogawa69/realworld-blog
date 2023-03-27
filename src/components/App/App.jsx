@@ -3,7 +3,12 @@ import { BrowserRouter as Router, Route } from 'react-router-dom'
 
 import ArticleList from '../ArticleList'
 import ArticlePage from '../ArticlePage'
+import CreateArticle from '../CreateArticle/CreateArticle'
+import EditArticle from '../EditArticle'
+import EditProfile from '../EditProfile/EditProfile'
 import Header from '../Header'
+import Login from '../Login'
+import Registration from '../Registration'
 
 import './App.scss'
 
@@ -17,10 +22,16 @@ const App = () => {
           <Route path={'/articles'} exact component={ArticleList}></Route>
           <Route
             path={'/articles/:slug'}
+            exact
             render={({ match }) => {
               return <ArticlePage slug={match.params.slug}></ArticlePage>
             }}
           ></Route>
+          <Route path={'/sign-up'} component={Registration}></Route>
+          <Route path={'/sign-in'} component={Login}></Route>
+          <Route path={'/profile'} component={EditProfile}></Route>
+          <Route path={'/new-article'} component={CreateArticle}></Route>
+          <Route path={'/articles/:slug/edit'} component={EditArticle}></Route>
         </main>
       </div>
     </Router>
