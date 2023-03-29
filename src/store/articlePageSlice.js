@@ -70,7 +70,7 @@ export const updateArticle = createAsyncThunk(
       }
 
       const article = await response.json()
-
+      console.log()
       dispatch(setEditedSlug(article.article.slug))
     } catch (error) {
       return rejectWithValue(error.message)
@@ -177,7 +177,6 @@ export const articlePageSlice = createSlice({
       state.error = true
     },
     [updateArticle.fulfilled]: (state) => {
-      state.edited = true
       state.loading = false
     },
     [updateArticle.pending]: (state) => {

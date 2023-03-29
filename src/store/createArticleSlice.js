@@ -45,6 +45,9 @@ export const createArticleSlice = createSlice({
       state.articleData = action.payload
       state.completed = true
     },
+    setCompleted: (state, action) => {
+      state.completed = action.payload
+    },
     setErrorData: (state, action) => {
       state.error = action.payload
     },
@@ -62,6 +65,6 @@ export const createArticleSlice = createSlice({
   },
 })
 
-export const { setArticleData, setErrorData } = createArticleSlice.actions
+export const { setArticleData, setCompleted, setErrorData } = createArticleSlice.actions
 
 export default createArticleSlice.reducer

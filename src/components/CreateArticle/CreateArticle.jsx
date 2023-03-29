@@ -4,8 +4,8 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { Redirect, useParams } from 'react-router-dom'
 
-import { getPage, updateArticle } from '../../store/articlePageSlice'
-import { createArticle } from '../../store/createArticleSlice'
+import { getPage, setEditedSlug, updateArticle } from '../../store/articlePageSlice'
+import { createArticle, setCompleted } from '../../store/createArticleSlice'
 
 import style from './CreateArticle.module.scss'
 
@@ -75,10 +75,16 @@ const CreateArticle = () => {
   }
 
   if (edited) {
+    setTimeout(() => {
+      dispatch(setEditedSlug(false))
+    }, 1000)
     return <Redirect to={`/articles/${edited}/`}></Redirect>
   }
 
   if (completed) {
+    setTimeout(() => {
+      dispatch(setCompleted(false))
+    }, 1000)
     return <Redirect to={`/articles/${articleData.slug}`}></Redirect>
   }
 
