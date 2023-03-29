@@ -1,3 +1,3 @@
-# aviasales
+# realworld-blog
 
-# Vercel: https://aviasales-red-two.vercel.app/
+# Vercel: https://realworld-blog-murex.vercel.app
