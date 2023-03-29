@@ -1,22 +1,39 @@
 import { Spin } from 'antd'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { Redirect, useParams } from 'react-router-dom'
 
-import { updateArticle } from '../../store/articlePageSlice'
+import { getPage, updateArticle } from '../../store/articlePageSlice'
 import { createArticle } from '../../store/createArticleSlice'
 
 import style from './CreateArticle.module.scss'
 
-const CreateArticle = ({ isEdit = false, prevArticleData = { tagList: [{ value: '' }] } }) => {
+const CreateArticle = () => {
   const dispatch = useDispatch()
-  const createState = useSelector((state) => state.create)
-  const { articleData, completed, loading, error } = createState
-  const editState = useSelector((state) => state.articlePage)
-  const { loading: editLoading } = editState
+  const { articleData, completed, loading, error } = useSelector((state) => state.create)
+  const { loading: editLoading } = useSelector((state) => state.articlePage)
+  const { pageData, edited, confirm } = useSelector((state) => state.articlePage)
+  const [complete, setComplete] = useState(false)
+  const [prevArticleData, setPrevArticleData] = useState({ tagList: [{ value: '' }] })
   const { slug } = useParams()
   const auth = localStorage.getItem('token')
+
+  useEffect(() => {
+    if (slug) {
+      if (!confirm) {
+        dispatch(getPage(slug))
+      } else {
+        setPrevArticleData({
+          title: pageData.title,
+          description: pageData.description,
+          body: pageData.body,
+          tagList: pageData.tagList.map((el) => ({ value: el })),
+        })
+        setComplete(true)
+      }
+    }
+  }, [confirm])
 
   const {
     register,
@@ -33,7 +50,7 @@ const CreateArticle = ({ isEdit = false, prevArticleData = { tagList: [{ value: 
   const onSubmit = (data) => {
     const { tagList } = data
     const formatTags = tagList.map((el) => el.value)
-    if (isEdit) {
+    if (slug) {
       dispatch(updateArticle({ ...data, tagList: formatTags, slug: slug }))
       return
     }
@@ -49,12 +66,16 @@ const CreateArticle = ({ isEdit = false, prevArticleData = { tagList: [{ value: 
     }
   }
 
-  if (loading || editLoading) {
+  if (loading || editLoading || (slug && !complete)) {
     return <Spin style={{ marginTop: 300 }}></Spin>
   }
 
   if (!auth) {
     return <Redirect to="/login"></Redirect>
+  }
+
+  if (edited) {
+    return <Redirect to={`/articles/${edited}/`}></Redirect>
   }
 
   if (completed) {
@@ -63,7 +84,7 @@ const CreateArticle = ({ isEdit = false, prevArticleData = { tagList: [{ value: 
 
   return (
     <div className={style.create}>
-      <span className={style.create__title}>{isEdit ? 'Edit article' : 'Create new article'}</span>
+      <span className={style.create__title}>{slug ? 'Edit article' : 'Create new article'}</span>
       <form className={style.create__form} onSubmit={handleSubmit(onSubmit)}>
         <label className={style.create__label} htmlFor="title">
           <span>Title</span>
@@ -146,7 +167,7 @@ const CreateArticle = ({ isEdit = false, prevArticleData = { tagList: [{ value: 
           </div>
         </label>
         <button className={style.create__submit} type="submit">
-          {isEdit ? 'Send' : 'Create'}
+          {slug ? 'Send' : 'Create'}
         </button>
       </form>
     </div>

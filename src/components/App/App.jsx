@@ -30,7 +30,7 @@ const App = () => {
           <Route path={'/sign-up'} component={Registration}></Route>
           <Route path={'/sign-in'} component={Login}></Route>
           <Route path={'/profile'} component={EditProfile}></Route>
-          <Route path={'/new-article'} component={CreateArticle}></Route>
+          <Route path={'/new-article'} exact component={CreateArticle}></Route>
           <Route path={'/articles/:slug/edit'} component={EditArticle}></Route>
         </main>
       </div>

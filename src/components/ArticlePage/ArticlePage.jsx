@@ -25,7 +25,7 @@ const ArticlePage = ({ slug }) => {
   if (loading && !error) {
     return <Spin style={{ marginTop: 300 }}></Spin>
   }
-  console.log(pageData)
+
   return (
     <div className={style['article-page']}>
       <Article isPage={true} {...pageData}></Article>
